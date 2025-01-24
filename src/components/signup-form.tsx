@@ -51,9 +51,9 @@ export function SignUpForm() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Left Section: Form */}
-      <div className="w-1/3 bg-white flex items-center justify-center">
+      <div className="w-full lg:w-1/3 bg-white flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex justify-center">
@@ -178,9 +178,9 @@ export function SignUpForm() {
           </CardContent>
         </Card>
       </div>
-
+  
       {/* Right Section: Abstract Design */}
-      <div className="w-2/3 flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 text-white relative">
+      <div className="hidden lg:flex w-2/3 items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 text-white relative">
         <div className="px-8 text-center z-10">
           <h1 className="text-4xl font-bold mb-4">"Your journey begins here"</h1>
           <p className="text-lg text-gray-200">
@@ -189,5 +189,6 @@ export function SignUpForm() {
         </div>
       </div>
     </div>
-  )
+  );
+  
 }
