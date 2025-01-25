@@ -36,7 +36,7 @@ export function Navbar() {
               <User className="h-5 w-5" />
               <span className="sr-only">Profile</span>
             </Button>
-            <Button className="hidden bg-pink-600 text-white hover:bg-pink-700 md:inline-flex">Log out</Button>
+            <Button className="hidden bg-pink-600 text-white hover:bg-pink-700 md:inline-flex">Sign in</Button>
           </nav>
           <Sheet>
             <SheetTrigger asChild>
