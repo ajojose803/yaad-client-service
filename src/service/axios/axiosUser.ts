@@ -7,7 +7,7 @@ import { store } from "../redux/store";
 
 const createAxios = (): AxiosInstance => {
     const axiosUser: AxiosInstance = axios.create({
-        baseURL:`${process.env.BASE_URL}/user`,
+        baseURL:`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
         withCredentials: true,
         headers: {
             "Content-Type": "application/json"

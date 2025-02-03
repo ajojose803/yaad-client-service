@@ -1,5 +1,5 @@
-import { Navbar } from "@/components/navbar"
-import { VendorLoginForm } from "@/components/vendor/vendor-login-form"
+import { Navbar } from "@/components/Navbar"
+import { VendorLoginForm } from "@/components/vendor/VendorLoginForm"
 
 export default function Page() {
   return (

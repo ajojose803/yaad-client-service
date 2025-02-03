@@ -1,5 +1,5 @@
-import { Navbar } from "@/components/navbar"
-import { SignInForm } from "@/components/signin-form"
+import { Navbar } from "@/components/Navbar"
+import { SignInForm } from "@/components/SignInForm"
 
 export default function Page() {
   return (
