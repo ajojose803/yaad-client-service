@@ -30,10 +30,23 @@ export const OTPVerification: React.FC<OtpComponentProps> = ({ values }) => {
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      document.getElementById(`otp-${index - 1}`)?.focus();
+    if (e.key === "Backspace") {
+      e.preventDefault(); // Prevent the default backspace behavior
+      const newOtp = [...otp];
+  
+      if (newOtp[index]) {
+        // If current input has a value, clear it
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        // If current input is already empty, move focus to the previous input and clear it
+        document.getElementById(`otp-${index - 1}`)?.focus();
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+      }
     }
   };
+  
 
   const handleVerify = async () => {
     setIsVerifying(true);
@@ -49,11 +62,11 @@ export const OTPVerification: React.FC<OtpComponentProps> = ({ values }) => {
 
     try {
       const { data } = await axiosUser().post("/registerUser", formData);
-      if (data.success) {
+      console.log(data);
+      if (data.message == 'Success') {
         toast.success("OTP verified successfully!");
         userLogin(data.user); 
         router.push('/dashboard');
-
       } else {
         toast.error("Invalid OTP. Please try again.");
       }

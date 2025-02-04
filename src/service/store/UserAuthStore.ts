@@ -6,7 +6,8 @@ interface UserAuthState {
   image?: string;
   email?: string;
   phone?: string;
-  loggedIn?: boolean;
+  loggedIn: boolean;
+  accessToken: string | null;
   userLogin: (data: UserAuthState) => void;
   userLogout: () => void;
 }
@@ -18,22 +19,23 @@ const useAuthStore = create<UserAuthState>((set) => ({
   email: "",
   phone: "",
   loggedIn: false,
+  accessToken: null,
 
-  userLogin: (data) => set({ ...data }),
+  userLogin: (data) => {
+    set({ ...data, loggedIn: true, accessToken: data.accessToken });
+  },
 
-  userLogout: () =>
-    set(() => {
-      localStorage.removeItem("userToken");
-      localStorage.removeItem("refreshToken");
-      return {
-        user: "",
-        userId: "",
-        image: "",
-        email: "",
-        phone: "",
-        loggedIn: false,
-      };
-    }),
+  userLogout: () => {
+    return set(() => ({
+      user: "",
+      userId: "",
+      image: "",
+      email: "",
+      phone: "",
+      loggedIn: false,
+      accessToken: null,
+    }));
+  },
 }));
 
 export default useAuthStore;

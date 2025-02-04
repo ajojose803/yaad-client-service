@@ -89,7 +89,7 @@ export function SignUpForm() {
         toast.success("OTP sent Successfully");
         setOtpPage(true);
       } else {
-        toast.error(data.message + "hellooo");
+        toast.error(data.message );
       }
     } catch (error: any) {
       toast.error((error as Error).message);

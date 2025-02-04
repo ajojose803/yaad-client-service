@@ -6,6 +6,7 @@ import { store } from "../redux/store";
 
 
 const createAxios = (): AxiosInstance => {
+    
     const axiosUser: AxiosInstance = axios.create({
         baseURL:`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
         withCredentials: true,
@@ -13,6 +14,7 @@ const createAxios = (): AxiosInstance => {
             "Content-Type": "application/json"
         }
     })
+
     axiosUser.interceptors.request.use(
         (config: InternalAxiosRequestConfig) => {
             const token = localStorage.getItem('userToken');
@@ -25,6 +27,7 @@ const createAxios = (): AxiosInstance => {
             return Promise.reject(error);
         }
     );
+
     axiosUser.interceptors.response.use(
     (response: AxiosResponse) => {
         return response;
