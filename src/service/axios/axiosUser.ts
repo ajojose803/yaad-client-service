@@ -1,71 +1,59 @@
-// import confi
 import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { useDispatch } from "react-redux";
-import { userLogout } from "../redux/slices/userAuthSlice";
-import { store } from "../redux/store";
-
+import useAuthStore from "@/service/store/UserAuthStore"; 
 
 const createAxios = (): AxiosInstance => {
-    
-    const axiosUser: AxiosInstance = axios.create({
-        baseURL:`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
-        withCredentials: true,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    })
+  const axiosUser: AxiosInstance = axios.create({
+    baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
+    withCredentials: true,
+    headers: { "Content-Type": "application/json" },
+  });
 
-    axiosUser.interceptors.request.use(
-        (config: InternalAxiosRequestConfig) => {
-            const token = localStorage.getItem('userToken');
-            if (token) {
-                config.headers.set('Authorization', `Bearer ${token}`);
-            }
-            return config;
-        },
-        (error: AxiosError) => {
-            return Promise.reject(error);
-        }
-    );
-
-    axiosUser.interceptors.response.use(
-    (response: AxiosResponse) => {
-        return response;
+  // Request Interceptor - Attach Access Token from Zustand
+  axiosUser.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+      const { accessToken } = useAuthStore.getState(); // Get token from Zustand
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+      return config;
     },
+    (error: AxiosError) => Promise.reject(error)
+  );
+
+  // Response Interceptor - Handle 401 & Refresh Token
+  axiosUser.interceptors.response.use(
+    (response: AxiosResponse) => response,
     async (error: AxiosError) => {
-        const originalRequest =  error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            const refreshToken = localStorage.getItem('refreshToken');
-            if(!refreshToken) {
-                localStorage.removeItem('userToken')
-                store.dispatch(userLogout())
-                return Promise.reject(error)
-            }
-            try {
-                const response = await axios.post(`${process.env.   URL}/auth/refresh`, {token: refreshToken});
-                const newAccessToken = response.data.accesstoken;
-                const newRefreshToken = response.data.refreshToken;
-                localStorage.setItem('userToken', newAccessToken);
-                if (newRefreshToken) {
-                    localStorage.setItem('refreshToken', newRefreshToken);
-                }
-                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                axiosUser.defaults.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                return axiosUser(originalRequest);
-            } catch (error) {
-                console.log(error);
-                localStorage.removeItem('userToken');
-                localStorage.removeItem('refreshToken');
-                const dispatch=useDispatch()
-                dispatch(userLogout())
-                window.location.href = '/login';
-                return Promise.reject(error);
-            }
+      const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          // Call refresh endpoint (uses HTTP-only cookies)
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`, {}, { withCredentials: true });
+
+          const newAccessToken = response.data.accessToken;
+
+          // Update Zustand store
+          useAuthStore.getState().setAccessToken(newAccessToken);
+
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return axiosUser(originalRequest);
+        } catch (refreshError) {
+          console.error("Refresh Token Failed:", refreshError);
+          useAuthStore.getState().userLogout();
+          window.location.href = "/signin";
+          return Promise.reject(refreshError);
         }
-        return Promise.reject(error);
-    })
-    return axiosUser;
-}
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
+  return axiosUser;
+};
 
 export default createAxios;

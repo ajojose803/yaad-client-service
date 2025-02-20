@@ -1,4 +1,4 @@
-import { DashboardSidebar } from "@/components/admin/sidebar";
+import { DashboardSidebar } from "@/components/admin/Sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({

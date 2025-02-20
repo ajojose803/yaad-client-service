@@ -10,50 +10,33 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { toast } from "react-toastify";
 import axiosUser from "@/service/axios/axiosUser";
 import { SignupData } from "@/interfaces/interface";
-import { OTPVerification } from "@/components/OtpVerification";
-import { UnknownAction } from "@reduxjs/toolkit";
+import { OTPVerification } from "@/components/user/OtpVerification";
+import useAuthStore from "@/service/store/UserAuthStore";
 
 const SignUpSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  name: Yup.string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must not exceed 50 characters")
-    .required("Name is required"),
-  phone: Yup.string()
-    .matches(/^[0-9]+$/, "Phone number must be numeric")
-    .min(10, "Phone number must be at least 10 digits")
-    .required("Phone number is required"),
-  password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), undefined], "Passwords must match")
-    .required("Confirm password is required"),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
+  name: Yup.string().min(2, "Name must be at least 2 characters").max(50, "Name must not exceed 50 characters").required("Name is required"),
+  phone: Yup.string().matches(/^[0-9]+$/, "Phone number must be numeric").min(10, "Phone number must be at least 10 digits").required("Phone number is required"),
+  password: Yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
+  confirmPassword: Yup.string().oneOf([Yup.ref("password"), undefined], "Passwords must match").required("Confirm password is required"),
 });
 
 export function SignUpForm() {
   const [otpPage, setOtpPage] = useState<boolean | null>(null);
-  const [userDetails, setUserDetails] = useState<{
-    email: string;
-    name: string;
-  }>({
-    email: "",
-    name: "",
-  });
-  const [formValues, setFormValues] = useState<SignupData>({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    image: null,
-  });
+  //const [userDetails, setUserDetails] = useState<{ email: string; name: string }>({ email: "", name: "" });
+  const [formValues, setFormValues] = useState<SignupData>({ name: "", email: "", phone: "", password: "", confirmPassword: "", image: null });
   const router = useRouter();
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const loggedIn = useAuthStore((state) => state.loggedIn);
+
+  // Redirect logged-in users from signup page to dashboard
+  useEffect(() => {
+    if (loggedIn) {
+      router.push("/dashboard"); // Redirect to dashboard if logged in
+    }
+  }, [loggedIn, router]);
 
   useEffect(() => {
     console.log("OTP Page Render Check:", otpPage);
@@ -74,7 +57,7 @@ export function SignUpForm() {
       if (err instanceof Error) {
         console.error("Error during signup:", err.message);
       } else {
-        console.log(" An unkown error");
+        console.log("An unknown error");
       }
     } finally {
       setSubmitting(false);
@@ -83,13 +66,12 @@ export function SignUpForm() {
 
   const signupOtp = async (email: string, name: string): Promise<any> => {
     try {
-      
-      const { data } = await axiosUser().post("/signupOtp", {email, name});
+      const { data } = await axiosUser().post("/signupOtp", { email, name });
       if (data.message === "success") {
         toast.success("OTP sent Successfully");
         setOtpPage(true);
       } else {
-        toast.error(data.message );
+        toast.error(data.message);
       }
     } catch (error: any) {
       toast.error((error as Error).message);

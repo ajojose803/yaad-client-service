@@ -1,6 +1,7 @@
 import {create} from "zustand";
 import Router from "next/router";
-import axiosAdmin from "@/service/store/AdminAuthStore"; // Ensure you send requests with credentials
+import axiosAdmin from "@/service/axios/axiosAdmin"; // Ensure you send requests with credentials
+import { useRouter } from "next/router";
 
 interface AdminAuthState {
   name: string;
@@ -9,7 +10,6 @@ interface AdminAuthState {
   adminLogout: () => void;
   checkAuth: () => Promise<void>;
 }
-
 const useAdminAuthStore = create<AdminAuthState>((set) => ({
   name: "",
   loggedIn: false,
@@ -20,14 +20,14 @@ const useAdminAuthStore = create<AdminAuthState>((set) => ({
   },
 
   adminLogout: () => {
+    const router = useRouter();
     console.log("Admin logout");
-    set({ name: "", loggedIn: false });
-    Router.push("/admin/login");
+    router.push("/admin/login");
   },
 
   checkAuth: async () => {
     try {
-      const { data } = await axiosAdmin().get("/admin/me");
+      const { data } = await axiosAdmin().get("/me");
       console.log("Auth check success:", data);
       set({ name: data.name, loggedIn: true });
     } catch (error) {

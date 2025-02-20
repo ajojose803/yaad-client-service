@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-
 import { Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OtpComponentProps } from "@/interfaces/interface";
-import axiosUser from "@/service/axios/axiosUser"; 
+import axiosUser from "@/service/axios/axiosUser";
 import useAuthStore from "@/service/store/UserAuthStore"; // Import Zustand store
 import { useRouter } from "next/navigation";
 
@@ -15,8 +14,15 @@ export const OTPVerification: React.FC<OtpComponentProps> = ({ values }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
 
+  const user = useAuthStore((state) => state.user); // Zustand state
   const userLogin = useAuthStore((state) => state.userLogin); // Zustand function
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard'); // Redirect to dashboard if user is logged in
+    }
+  }, [user, router]);
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d$/.test(value)) return;
@@ -35,18 +41,15 @@ export const OTPVerification: React.FC<OtpComponentProps> = ({ values }) => {
       const newOtp = [...otp];
   
       if (newOtp[index]) {
-        // If current input has a value, clear it
         newOtp[index] = "";
         setOtp(newOtp);
       } else if (index > 0) {
-        // If current input is already empty, move focus to the previous input and clear it
         document.getElementById(`otp-${index - 1}`)?.focus();
         newOtp[index - 1] = "";
         setOtp(newOtp);
       }
     }
   };
-  
 
   const handleVerify = async () => {
     setIsVerifying(true);
@@ -59,13 +62,11 @@ export const OTPVerification: React.FC<OtpComponentProps> = ({ values }) => {
       otp: otpValue,
     };
 
-
     try {
       const { data } = await axiosUser().post("/registerUser", formData);
-      console.log(data);
-      if (data.message == 'Success') {
+      if (data.message === "Success") {
         toast.success("OTP verified successfully!");
-        userLogin(data.user); 
+        userLogin(data.user); // Set user in Zustand store
         router.push('/dashboard');
       } else {
         toast.error("Invalid OTP. Please try again.");

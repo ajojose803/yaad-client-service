@@ -1,10 +1,39 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Users, Store, ChevronRight } from "lucide-react"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/service/store/UserAuthStore";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
+import { Spinner } from "@/components/ui/spinner"
 
 export function DashboardPage() {
-  const categories = ["Photographers", "DJs", "Beauty", "Planners", "Florists"]
+  const categories = ["Photographers", "DJs", "Beauty", "Planners", "Florists"];
+  //const { accessToken } = useAuthStore(); // Get the access token from Zustand store
+  const router = useRouter(); // Get the router object for redirection
+  const loggedIn = useAuthStore((state) => state.loggedIn);
+
+  useEffect(() => {
+    if (!loggedIn) {
+      router.push("/signin"); // Redirect to login page if user is not logged in
+    }
+  }, [loggedIn, router]);
+ 
+  if (!loggedIn) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen">
+        <Alert variant="default" className="flex items-center space-x-4">
+          <Spinner className="h-8 w-8" />
+          <div>
+            <AlertTitle>Redirecting...</AlertTitle>
+            <AlertDescription>Please wait while we redirect you to the login page.</AlertDescription>
+          </div>
+        </Alert>
+      </div>
+    ); 
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -96,4 +125,3 @@ export function DashboardPage() {
     </div>
   )
 }
-

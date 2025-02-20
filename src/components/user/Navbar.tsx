@@ -1,11 +1,21 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Bell, Menu, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import Link from "next/link";
+import { Bell, Menu, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import useAuthStore from "@/service/store/UserAuthStore"; // Now holds only UI state (loggedIn, user data)
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
+  const { loggedIn, userLogout } = useAuthStore(); // Use loggedIn flag and logout function
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await userLogout(); // This calls the API to clear the cookie and resets the UI state
+    router.push("/signin"); // Redirect to login page after logout
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-black">
       <div className="container flex h-14 items-center">
@@ -36,7 +46,18 @@ export function Navbar() {
               <User className="h-5 w-5" />
               <span className="sr-only">Profile</span>
             </Button>
-            <Button className="hidden bg-pink-600 text-white hover:bg-pink-700 md:inline-flex">Sign in</Button>
+            {loggedIn ? (
+              <Button
+                className="hidden bg-pink-600 text-white hover:bg-pink-700 md:inline-flex"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <Button className="hidden bg-pink-600 text-white hover:bg-pink-700 md:inline-flex">
+                Sign In
+              </Button>
+            )}
           </nav>
           <Sheet>
             <SheetTrigger asChild>
@@ -59,13 +80,20 @@ export function Navbar() {
                 <Link href="/vendors" className="text-sm font-medium">
                   Vendors
                 </Link>
-                <Button className="w-full bg-pink-600 text-white hover:bg-pink-700">Sign Up</Button>
+                {loggedIn ? (
+                  <Button className="w-full bg-pink-600 text-white hover:bg-pink-700">
+                      Log Out
+                </Button>
+                ):(
+                  <Button className="w-full bg-pink-600 text-white hover:bg-pink-700">
+                  Sign Up
+                </Button>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
         </div>
       </div>
     </header>
-  )
+  );
 }
-

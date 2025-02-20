@@ -1,11 +1,11 @@
 import { Navbar } from "@/components/user/Navbar"
-import { VendorLoginForm } from "@/components/vendor/VendorLoginForm"
+import { SignInForm } from "@/components/user/SignInForm"
 
 export default function Page() {
   return (
     <>
       <Navbar />
-      <VendorLoginForm />
+      <SignInForm />
     </>
   )
 }
