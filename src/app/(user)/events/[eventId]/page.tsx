@@ -1,0 +1,14 @@
+import { Navbar } from "@/components/user/Navbar";
+// import {DashboardPage} from "@/components/user/UserDashboard";
+
+export default function Page() {
+  return (
+    <>
+      <Navbar />
+      <div>
+        <h1>Event Page</h1>
+      </div>
+      {/* <DashboardPage /> */}
+    </>
+  )
+}

@@ -29,3 +29,69 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+
+.slider-container {
+  position: relative;
+  padding: 10px 0;
+  margin: 0 -10px; /* Reduced negative margin */
+  
+  .slick-slider {
+    padding-top: 40px;  /* Make space for navigation buttons */
+  }
+  
+  .slick-slide {
+    transition: all 0.3s ease;
+  }
+  
+  .slick-list {
+    margin: 0 -2px; /* Reduced margin for tighter spacing */
+    padding: 5px 0; /* Reduced padding */
+  }
+  
+  .slick-prev, .slick-next {
+    top: 0;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    z-index: 1;
+    
+    &:before {
+      color: #6366f1;
+      font-size: 20px; /* Slightly smaller */
+      opacity: 0.6;
+    }
+
+    &:hover:before {
+      opacity: 1;
+    }
+  }
+  
+  .slick-prev {
+    right: 40px;  /* Position from right instead of left */
+    left: auto;    /* Reset default left position */
+  }
+  
+  .slick-next {
+    right: 0;
+  }
+  
+  .slick-dots {
+    bottom: -30px;
+    
+    li {
+      margin: 0 2px;
+      
+      button:before {
+        font-size: 6px;
+        color: #6366f1;
+        opacity: 0.3;
+        transition: all 0.2s ease;
+      }
+      
+      &.slick-active button:before {
+        opacity: 0.8;
+        transform: scale(1.2);
+      }
+    }
+  }
+}

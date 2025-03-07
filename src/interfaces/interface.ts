@@ -19,13 +19,13 @@ export interface LoginFormValues {
     confirmPassword: string;
   }
   
-  export type Service = {
-    _id: string;
+  export interface Event {
     name: string;
-    price: number;
-    serviceImage: string;
-    description: string;
-  };
+    date: string;
+    startTime: string;
+    endTime: string;
+    venueName: string;
+  }
   
   export interface Expert {
     message?: string;
